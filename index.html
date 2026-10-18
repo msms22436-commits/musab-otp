@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>رسائل نصية قصيرة من زينتريكس - Zentrix SMS</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts: Cairo -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              main: '#121927',
+              sidebar: '#171e2e',
+              card: '#1c2436',
+              border: '#273147',
+              pink: '#e11d48',
+              accent: '#3b82f6',
+              gold: '#f59e0b',
+              green: '#10b981'
+            }
+          },
+          fontFamily: {
+            sans: ['Cairo', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #0d121d;
+      color: #f3f4f6;
+    }
+
+    .glass-card {
+      background: rgba(28, 36, 54, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #121927;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #273147;
+      border-radius: 4px;
+    }
+
+    .active-nav {
+      background: linear-gradient(90deg, #e11d48 0%, #be123c 100%);
+      color: white !important;
+      box-shadow: 0 4px 15px rgba(225, 29, 72, 0.35);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden text-sm">
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-5 left-5 z-50 flex flex-col gap-2"></div>
+
+  <!-- AUTH SECTION (Login / Register Modal) -->
+  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+    <div class="glass-card w-full max-w-md rounded-2xl p-6 sm:p-8 shadow-2xl relative border border-brand-border">
+      
+      <!-- Modal Tabs -->
+      <div class="flex border-b border-brand-border mb-6">
+        <button id="tab-login-btn" onclick="switchAuthTab('login')" class="w-1/2 pb-3 font-bold text-center border-b-2 border-brand-pink text-brand-pink transition-all">تسجيل الدخول</button>
+        <button id="tab-register-btn" onclick="switchAuthTab('register')" class="w-1/2 pb-3 font-bold text-center border-b-2 border-transparent text-gray-400 hover:text-white transition-all">إنشاء حساب جديد</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block mb-1 text-xs text-gray-400">اسم المستخدم أو البريد الإلكتروني</label>
+          <input type="text" id="login-username" required class="w-full bg-brand-main border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-pink" placeholder="أدخل اسم المستخدم">
+        </div>
+        <div>
+          <label class="block mb-1 text-xs text-gray-400">كلمة المرور</label>
+          <input type="password" id="login-password" required class="w-full bg-brand-main border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-pink" placeholder="••••••••">
+        </div>
+        <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-pink-600/30">
+          تسجيل الدخول <i class="fa-solid fa-right-to-bracket mr-2"></i>
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block mb-1 text-xs text-gray-400">الاسم الكامل</label>
+          <input type="text" id="reg-fullname" required class="w-full bg-brand-main border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-pink" placeholder="أدخل اسمك الكامل">
+        </div>
+        <div>
+          <label class="block mb-1 text-xs text-gray-400">اسم المستخدم</label>
+          <input type="text" id="reg-username" required class="w-full bg-brand-main border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-pink" placeholder="sudanism">
+        </div>
+        <div>
+          <label class="block mb-1 text-xs text-gray-400">البريد الإلكتروني</label>
+          <input type="email" id="reg-email" required class="w-full bg-brand-main border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-pink" placeholder="user@example.com">
+        </div>
+        <div>
+          <label class="block mb-1 text-xs text-gray-400">كلمة المرور</label>
+          <input type="password" id="reg-password" required class="w-full bg-brand-main border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-pink" placeholder="••••••••">
+        </div>
+        <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-teal-600/30">
+          إنشاء حساب مجاني <i class="fa-solid fa-user-plus mr-2"></i>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="app-container" class="flex min-h-screen w-full relative">
+
+    <!-- Mobile Overlay -->
+    <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-30 lg:hidden hidden"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed lg:static top-0 right-0 h-full w-64 bg-brand-sidebar border-l border-brand-border z-40 transition-transform duration-300 transform translate-x-full lg:translate-x-0 flex flex-col justify-between custom-scrollbar overflow-y-auto">
+      <div>
+        <!-- Brand Logo Header -->
+        <div class="p-5 border-b border-brand-border flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-indigo-600 flex items-center justify-center text-white text-xl shadow-lg shadow-rose-600/30">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <div>
+            <h1 class="font-extrabold text-sm text-white leading-tight">رسائل نصية قصيرة من زينتريكس</h1>
+            <span class="text-[10px] text-gray-400 flex items-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> متصل - ZENTRIX
+            </span>
+          </div>
+        </div>
+
+        <!-- Navigation Section 1 -->
+        <div class="p-3">
+          <p class="text-[11px] font-semibold text-gray-500 px-3 my-2">لوحة التحكم</p>
+          <nav class="space-y-1">
+            <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item active-nav flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all">
+              <i class="fa-solid fa-chart-pie w-5"></i> لوحة التحكم
+            </a>
+            <a href="#" onclick="showSection('my_codes')" id="nav-my_codes" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-envelope-open-text w-5"></i> my_codes
+            </a>
+            <a href="#" onclick="showSection('my_numbers')" id="nav-my_numbers" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-mobile-screen-button w-5"></i> أرقامي
+            </a>
+            <a href="#" onclick="showSection('test_range')" id="nav-test_range" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-layer-group w-5"></i> نطاق الاختبار
+            </a>
+            <a href="#" onclick="showSection('number_requests')" id="nav-number_requests" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-box-archive w-5"></i> طلبات الأرقام
+            </a>
+          </nav>
+
+          <p class="text-[11px] font-semibold text-gray-500 px-3 my-2 mt-5">حساب</p>
+          <nav class="space-y-1">
+            <a href="#" onclick="showSection('chat')" id="nav-chat" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-comments w-5"></i> محادثة
+            </a>
+            <a href="#" onclick="showSection('tickets')" id="nav-tickets" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-ticket w-5"></i> تذاكر
+            </a>
+            <a href="#" onclick="showSection('earnings')" id="nav-earnings" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-sack-dollar w-5"></i> الأرباح $
+            </a>
+            <a href="#" onclick="showSection('withdraw')" id="nav-withdraw" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-wallet w-5"></i> ينسحب
+            </a>
+            <a href="#" onclick="showSection('api_keys')" id="nav-api_keys" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-key w-5"></i> مفاتيح واجهة برمجة التطبيقات
+            </a>
+            <a href="#" onclick="showSection('invoices')" id="nav-invoices" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-file-invoice-dollar w-5"></i> الفواتير
+            </a>
+            <a href="#" onclick="showSection('webhooks')" id="nav-webhooks" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-link w-5"></i> روابط ويب
+            </a>
+            <a href="#" onclick="showSection('2fa')" id="nav-2fa" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card transition-all">
+              <i class="fa-solid fa-shield-halved w-5"></i> المصادقة الثنائية
+            </a>
+          </nav>
+
+          <p class="text-[11px] font-semibold text-gray-500 px-3 my-2 mt-5">برنامج</p>
+          <div class="px-2">
+            <button onclick="downloadApp()" class="w-full bg-brand-card border border-brand-border hover:border-brand-pink text-gray-300 hover:text-white p-2.5 rounded-xl text-xs flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-mobile-button text-brand-pink"></i> تنزيل التطبيق
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer / Logout -->
+      <div class="p-3 border-t border-brand-border">
+        <button onclick="handleLogout()" class="w-full text-right text-rose-500 hover:text-rose-400 p-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all">
+          <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENT WRAPPER -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+      <!-- TOP HEADER -->
+      <header class="h-16 bg-brand-sidebar border-b border-brand-border px-4 sm:px-6 flex items-center justify-between sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+          <button onclick="toggleSidebar()" class="lg:hidden text-gray-400 hover:text-white p-2 rounded-lg bg-brand-card border border-brand-border">
+            <i class="fa-solid fa-bars text-lg"></i>
+          </button>
+          <span id="page-title" class="font-bold text-white text-base">لوحة التحكم</span>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-4">
+          <!-- Refresh Button -->
+          <button onclick="refreshData()" class="p-2 sm:px-3 sm:py-2 bg-brand-card border border-brand-border hover:border-brand-pink rounded-xl text-xs text-gray-300 hover:text-white flex items-center gap-1.5 transition-all">
+            <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">ينعش</span>
+          </button>
+
+          <!-- Daily Bonus Button -->
+          <button onclick="claimBonus()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs px-3 py-2 rounded-xl font-bold shadow-lg shadow-indigo-600/30 flex items-center gap-1.5 transition-all">
+            <span>مكافأة يومية 🎁</span>
+          </button>
+
+          <!-- User Badge -->
+          <div class="flex items-center gap-2 pl-1 bg-brand-card border border-brand-border rounded-xl p-1">
+            <div id="user-avatar" class="w-7 h-7 rounded-lg bg-rose-600 text-white font-black text-xs flex items-center justify-center">
+              S
+            </div>
+            <span id="user-display-name" class="font-bold text-xs text-gray-200 hidden md:inline px-1">سودانسم</span>
+            <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-1.5 py-0.5 rounded-md border border-emerald-500/20">
+              الانتصاب 🔴
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <!-- DYNAMIC VIEWS CONTAINER -->
+      <main class="p-4 sm:p-6 space-y-6 flex-1 overflow-x-hidden">
+
+        <!-- 1. DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view-panel space-y-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+                أهلاً وسهلاً 👋 <span id="welcome-username" class="text-brand-pink">سودانسم</span>
+              </h2>
+              <p class="text-xs text-gray-400 mt-1">نظرة عامة على حسابك ونشاط استخدام الرسائل النصية</p>
+            </div>
+            <button onclick="openAuthModal()" class="bg-brand-pink hover:bg-rose-600 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-user-plus"></i> إنشاء حساب جديد
+            </button>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Card 1 -->
+            <div class="glass-card rounded-2xl p-5 flex items-center justify-between border-r-4 border-indigo-500">
+              <div>
+                <p class="text-xs text-gray-400 font-semibold mb-1">أرقامي</p>
+                <h3 id="stat-numbers" class="text-2xl font-black text-white">0</h3>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-mobile-screen"></i>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="glass-card rounded-2xl p-5 flex items-center justify-between border-r-4 border-sky-500">
+              <div>
+                <p class="text-xs text-gray-400 font-semibold mb-1">اليوم</p>
+                <h3 id="stat-today" class="text-2xl font-black text-white">0</h3>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center text-xl">
+                <i class="fa-paper-plane text-sky-400"></i>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="glass-card rounded-2xl p-5 flex items-center justify-between border-r-4 border-emerald-500">
+              <div>
+                <p class="text-xs text-gray-400 font-semibold mb-1">توازن</p>
+                <h3 id="stat-balance" class="text-2xl font-black text-emerald-400">0.00 دولار</h3>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-dollar-sign"></i>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="glass-card rounded-2xl p-5 flex items-center justify-between border-r-4 border-amber-500">
+              <div>
+                <p class="text-xs text-gray-400 font-semibold mb-1">إجمالي الرموز</p>
+                <h3 id="stat-total-codes" class="text-2xl font-black text-white">0</h3>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-envelope"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Card -->
+          <div class="glass-card rounded-2xl p-5">
+            <h3 class="font-bold text-white text-sm mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-rose-500"></i> نشاط الرسائل النصية القصيرة - آخر 7 أيام
+            </h3>
+            <div class="h-64 w-full">
+              <canvas id="activityChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Latest Codes Empty State -->
+          <div class="glass-card rounded-2xl p-6 text-center">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-white text-sm flex items-center gap-2">
+                <i class="fa-solid fa-envelope-open-text text-brand-pink"></i> أحدث الأكواد
+              </h3>
+              <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20">مباشر ●</span>
+            </div>
+            <div class="py-12 flex flex-col items-center justify-center text-gray-500 space-y-3">
+              <div class="w-16 h-16 rounded-2xl bg-brand-main flex items-center justify-center text-3xl">
+                <i class="fa-solid fa-inbox"></i>
+              </div>
+              <p class="font-bold text-gray-400">لا توجد بيانات</p>
+              <p class="text-xs">لم يتم استقبال أي أكواد جديدة في الوقت الحالي</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. MY CODES VIEW -->
+        <section id="view-my_codes" class="view-panel space-y-6 hidden">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-white">أكوادي (OTP Live Feed)</h2>
+              <p class="text-xs text-gray-400">عرض واستقبال أكواد التحقق المباشرة</p>
+            </div>
+            <button onclick="generateMockCode()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold px-4 py-2 rounded-xl text-xs transition-all flex items-center gap-2">
+              <i class="fa-solid fa-bolt"></i> توليد كود جديد تلقائياً
+            </button>
+          </div>
+
+          <!-- Filter & Search Bar -->
+          <div class="glass-card rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+              <button class="bg-brand-pink text-white px-4 py-1.5 rounded-xl text-xs font-bold">الكل</button>
+              <button class="bg-brand-main text-gray-400 hover:text-white px-4 py-1.5 rounded-xl text-xs font-semibold">اليوم</button>
+              <button class="bg-brand-main text-gray-400 hover:text-white px-4 py-1.5 rounded-xl text-xs font-semibold">الأسبوع</button>
+              <button class="bg-brand-main text-gray-400 hover:text-white px-4 py-1.5 rounded-xl text-xs font-semibold">شهر</button>
+            </div>
+            <div class="relative w-full md:w-72">
+              <input type="text" placeholder="...بحث عن رقم أو رمز أو تطبيق" class="w-full bg-brand-main border border-brand-border rounded-xl px-4 py-2 pr-10 text-xs text-white focus:outline-none focus:border-brand-pink">
+              <i class="fa-solid fa-magnifying-glass absolute top-3 right-3 text-gray-500 text-xs"></i>
+            </div>
+          </div>
+
+          <!-- Codes Feed Container -->
+          <div id="codes-feed" class="space-y-4">
+            <!-- Mock Code Card 1 -->
+            <div class="glass-card rounded-2xl p-4 border border-brand-border hover:border-amber-500/50 transition-all flex flex-col md:flex-row items-center justify-between gap-4">
+              <div class="flex items-center gap-4 w-full md:w-auto">
+                <div class="w-12 h-12 rounded-2xl bg-black/40 border border-brand-border flex items-center justify-center text-2xl text-amber-400">
+                  <i class="fa-brands fa-tiktok"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-white text-base">تيك توك</h4>
+                  <p class="text-xs text-gray-400 font-mono flex items-center gap-2 mt-0.5">
+                    <span>🇳🇴 +4748044182</span>
+                    <span>• 2026-10-18 12:17:20</span>
+                  </p>
+                </div>
+              </div>
+              
+              <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+                <div class="bg-amber-500/10 border border-amber-500/30 px-5 py-2 rounded-xl font-mono text-2xl font-black text-amber-400 tracking-wider">
+                  963794
+                </div>
+                <button onclick="copyToClipboard('963794')" class="bg-brand-main border border-brand-border hover:border-brand-pink text-xs text-gray-200 px-3 py-2 rounded-xl transition-all">
+                  انسخ الكود <i class="fa-regular fa-copy mr-1"></i>
+                </button>
+                <button onclick="copyToClipboard('رمز تيك توك الخاص بك هو 963794')" class="bg-brand-main border border-brand-border hover:border-brand-pink text-xs text-gray-200 px-3 py-2 rounded-xl transition-all">
+                  نسخ الرسالة <i class="fa-regular fa-message mr-1"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Mock Code Card 2 -->
+            <div class="glass-card rounded-2xl p-4 border border-brand-border hover:border-amber-500/50 transition-all flex flex-col md:flex-row items-center justify-between gap-4">
+              <div class="flex items-center gap-4 w-full md:w-auto">
+                <div class="w-12 h-12 rounded-2xl bg-black/40 border border-brand-border flex items-center justify-center text-2xl text-amber-400">
+                  <i class="fa-brands fa-tiktok"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-white text-base">تيك توك</h4>
+                  <p class="text-xs text-gray-400 font-mono flex items-center gap-2 mt-0.5">
+                    <span>🇳🇴 +4748153203</span>
+                    <span>• 2026-10-18 09:07:07</span>
+                  </p>
+                </div>
+              </div>
+              
+              <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+                <div class="bg-amber-500/10 border border-amber-500/30 px-5 py-2 rounded-xl font-mono text-2xl font-black text-amber-400 tracking-wider">
+                  656145
+                </div>
+                <button onclick="copyToClipboard('656145')" class="bg-brand-main border border-brand-border hover:border-brand-pink text-xs text-gray-200 px-3 py-2 rounded-xl transition-all">
+                  انسخ الكود <i class="fa-regular fa-copy mr-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. MY NUMBERS VIEW -->
+        <section id="view-my_numbers" class="view-panel space-y-6 hidden">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-lg font-bold text-white">أرقامي 📱</h2>
+              <p class="text-xs text-gray-400">لم يتم تخصيص أي أرقام بعد</p>
+            </div>
+            <div class="flex gap-2">
+              <button class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                جميع الأرقام +
+              </button>
+              <button class="bg-brand-main border border-brand-border text-gray-300 px-4 py-2 rounded-xl text-xs font-semibold">
+                تصدير ملف نصي 📄
+              </button>
+            </div>
+          </div>
+
+          <div class="glass-card rounded-2xl p-12 text-center space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-brand-main border border-brand-border flex items-center justify-center text-2xl text-gray-500 mx-auto">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+            </div>
+            <h3 class="text-base font-bold text-white">لم يتم تخصيص أرقام</h3>
+            <p class="text-xs text-gray-400 max-w-sm mx-auto">
+              افتح نطاق الاختبار وانسخ اسم النطاق وأرسله إلى الدعم لطلب الأرقام.
+            </p>
+            <button onclick="showSection('chat')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all shadow-lg shadow-indigo-600/30">
+              دردشة مفتوحة 💬
+            </button>
+          </div>
+        </section>
+
+        <!-- 4. TEST RANGE VIEW -->
+        <section id="view-test_range" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-lg font-bold text-white">نطاق الاختبار 🧬</h2>
+            <p class="text-xs text-gray-400">نطاق واحد متاح حالياً للاختبار</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-4 border border-brand-border">
+            <div class="flex items-center gap-4">
+              <div class="text-3xl">🇳🇴</div>
+              <div>
+                <h4 class="font-bold text-white text-base">النروج-زينتريكس-تي1</h4>
+                <p class="text-xs text-gray-400 mt-0.5">النروج • تيك توك | كمية المتوفر: <span class="text-emerald-400 font-bold">1000</span></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="copyToClipboard('النروج-زينتريكس-تي1')" class="bg-brand-main border border-brand-border hover:border-brand-pink text-xs text-white px-4 py-2 rounded-xl transition-all">
+                نطاق النسخ <i class="fa-regular fa-copy mr-1"></i>
+              </button>
+              <button onclick="showSection('number_requests')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all">
+                أرقام الطلبات 🌐
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. NUMBER REQUESTS VIEW -->
+        <section id="view-number_requests" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-lg font-bold text-white">طلبات الأرقام 📥</h2>
+            <p class="text-xs text-gray-400">اطلب الأرقام وتابع كل قرار من حسابك</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <h3 class="font-bold text-white text-sm">أرسل طلب رقم</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">رمز الدولة (اختياري)</label>
+                <input type="text" placeholder="مثال: 971+" class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">اسم النطاق (اختياري)</label>
+                <input type="text" placeholder="مثال: Mongolia-Mix-01" class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">عدد الأرقام</label>
+                <input type="number" value="100" class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">ملاحظات</label>
+                <input type="text" placeholder="تفاصيل إضافية للدمع" class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+              </div>
+            </div>
+            <button onclick="showToast('تم إرسال طلب الأرقام بنجاح', 'success')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all">
+              إرسال الطلب 🚀
+            </button>
+          </div>
+        </section>
+
+        <!-- 6. CHAT VIEW -->
+        <section id="view-chat" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-lg font-bold text-white">محادثة 💬</h2>
+            <p class="text-xs text-gray-400">تحدث مع مساعد الذكاء الاصطناعي الخاص بالمنصة</p>
+          </div>
+
+          <div class="glass-card rounded-2xl flex flex-col h-[480px]">
+            <!-- Chat Messages Area -->
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs">
+                  🤖
+                </div>
+                <div class="bg-brand-main border border-brand-border p-3 rounded-2xl max-w-md text-xs text-gray-200">
+                  مرحباً بك! أنا مساعد ZENTRIX. كيف يمكنني مساعدتك في إدارة أرقامك أو طلب أكواد جديدة اليوم؟
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Input Bar -->
+            <div class="p-3 border-t border-brand-border flex gap-2">
+              <input type="text" id="chat-input" placeholder="اكتب رسالتك هنا..." class="flex-1 bg-brand-main border border-brand-border rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-pink" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+              <button onclick="sendChatMessage()" class="bg-brand-pink hover:bg-rose-600 text-white px-5 rounded-xl font-bold text-xs transition-all">
+                إرسال <i class="fa-solid fa-paper-plane mr-1"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. TICKETS VIEW -->
+        <section id="view-tickets" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-lg font-bold text-white">تذاكر الدعم الفني 🎫</h2>
+            <p class="text-xs text-gray-400">متابعة وإنشاء تذاكر الدعم والطلبات</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <h3 class="font-bold text-white text-sm">تذكرة جديدة +</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">الموضوع</label>
+                <input type="text" placeholder="موضوع التذكرة..." class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">الفئة</label>
+                <select class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+                  <option>عام</option>
+                  <option>طلب أرقام</option>
+                  <option>مشكلة في الشحن</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">الرسالة</label>
+              <textarea rows="3" placeholder="تفاصيل الطلب..." class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white"></textarea>
+            </div>
+            <button onclick="showToast('تم إنشاء التذكرة بنجاح', 'success')" class="bg-brand-pink hover:bg-rose-600 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all">
+              إنشاء تذكرة 🚀
+            </button>
+          </div>
+        </section>
+
+        <!-- 8. EARNINGS VIEW -->
+        <section id="view-earnings" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-lg font-bold text-white">الأرباح 💵</h2>
+            <p class="text-xs text-gray-400">تتبع دخلك وسجل المعاملات المالية</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="glass-card rounded-2xl p-5 border-r-4 border-emerald-500">
+              <p class="text-xs text-gray-400">إجمالي الأرباح</p>
+              <h3 class="text-2xl font-black text-emerald-400 mt-1">0.00 دولار</h3>
+            </div>
+            <div class="glass-card rounded-2xl p-5 border-r-4 border-indigo-500">
+              <p class="text-xs text-gray-400">إجمالي الرموز</p>
+              <h3 class="text-2xl font-black text-white mt-1">0</h3>
+            </div>
+            <div class="glass-card rounded-2xl p-5 border-r-4 border-amber-500">
+              <p class="text-xs text-gray-400">تم سحبه</p>
+              <h3 class="text-2xl font-black text-amber-400 mt-1">0.00 دولار</h3>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9. WITHDRAW VIEW -->
+        <section id="view-withdraw" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-lg font-bold text-white">طلب سحب الأرباح 💳</h2>
+            <p class="text-xs text-gray-400">اسحب أرباحك بأمان إلى محفظتك الإلكترونية</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-amber-400 text-xs flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>إشعار: الحد الأدنى للسحب هو <b>20.00 دولار</b>.</span>
+            </div>
+
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">المبلغ ($)</label>
+              <input type="number" placeholder="20.00" class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">طريقة الدفع</label>
+              <select class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+                <option>دولار أمريكي (USDT - TRC20) 💵</option>
+                <option>Payeer</option>
+                <option>Binance Pay</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">تفاصيل الدفع (رقم المحفظة)</label>
+              <input type="text" placeholder="أدخل عنوان المحفظة الخاص بك" class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+            </div>
+            <button onclick="showToast('رصيدك غير كافٍ لإتمام السحب حالياً', 'error')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs transition-all">
+              تقديم طلب السحب 📤
+            </button>
+          </div>
+        </section>
+
+        <!-- 10. API KEYS VIEW -->
+        <section id="view-api_keys" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-lg font-bold text-white">مفاتيح API 🔑</h2>
+            <p class="text-xs text-gray-400">ربط المنصة مع برامجك وتطبيقاتك الخاصة</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <h3 class="font-bold text-white text-sm">إنشاء مفتاح جديد +</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">اسم المفتاح</label>
+                <input type="text" value="Default" class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">الحد الأقصى للمعدل (طلب/ساعة)</label>
+                <input type="number" value="1000" class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+              </div>
+            </div>
+            <button onclick="showToast('تم إنشاء مفتاح API جديد', 'success')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-5 py-2 rounded-xl text-xs">
+              إنشاء مفتاح
+            </button>
+
+            <!-- Active Key Box -->
+            <div class="mt-6 pt-6 border-t border-brand-border">
+              <p class="text-xs font-bold text-gray-400 mb-2">مفاتيحي النشطة:</p>
+              <div class="bg-brand-main border border-brand-border p-3 rounded-xl flex items-center justify-between font-mono text-xs text-rose-400">
+                <span>znt_live_895730865730d01ec3af680ac28b5107...</span>
+                <button onclick="copyToClipboard('znt_live_895730865730d01ec3af680ac28b5107')" class="text-gray-300 hover:text-white bg-brand-card px-3 py-1 rounded-lg">
+                  نسخ
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 11. INVOICES VIEW -->
+        <section id="view-invoices" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-lg font-bold text-white">فواتيري 🧾</h2>
+            <p class="text-xs text-gray-400">سجل وسندات المشتريات والخدمات</p>
+          </div>
+          <div class="glass-card rounded-2xl p-12 text-center text-gray-500">
+            <i class="fa-solid fa-receipt text-4xl mb-3"></i>
+            <p class="font-bold text-gray-400">لم يتم إصدار أي فواتير حتى الآن</p>
+          </div>
+        </section>
+
+        <!-- 12. WEBHOOKS VIEW -->
+        <section id="view-webhooks" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-lg font-bold text-white">روابط الويب (Webhooks) 🔗</h2>
+            <p class="text-xs text-gray-400">تلقي إشعارات الأكواد مباشرة بروتوكول HTTP</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">رابط الويب هوك الخاص بك</label>
+              <input type="url" value="https://your-app.com/webhook/ZENTRIX-SMS" class="w-full bg-brand-main border border-brand-border rounded-xl p-3 text-xs text-white">
+            </div>
+            <button onclick="showToast('تم حفظ إعدادات Webhook', 'success')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs">
+              حفظ 💾
+            </button>
+          </div>
+        </section>
+
+        <!-- 13. 2FA VIEW -->
+        <section id="view-2fa" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-lg font-bold text-white">المصادقة الثنائية (2FA) 🛡️</h2>
+            <p class="text-xs text-gray-400">تأمين حسابك بأقصى درجة أمان ممتازة</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-6 text-center space-y-4 max-w-lg mx-auto">
+            <div class="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center text-3xl mx-auto border border-emerald-500/20">
+              <i class="fa-solid fa-shield-virus"></i>
+            </div>
+            <h3 class="font-bold text-white text-base">حالة التحقق بخطوتين: <span class="text-rose-500">غير مفعل</span></h3>
+            <p class="text-xs text-gray-400">
+              قم بربط تطبيق Google Authenticator لتأمين الدخول وسحب الأرباح.
+            </p>
+            <button onclick="showToast('تم إرسال رمز التفعيل إلى بريدك الإلكتروني', 'info')" class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold px-6 py-3 rounded-xl text-xs shadow-lg shadow-indigo-600/30">
+              تفعيل المصادقة الثنائية 🔒
+            </button>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    // State Management
+    let currentUser = JSON.parse(localStorage.getItem('zentrix_user')) || {
+      fullname: 'سودانسم',
+      username: 'sudanism',
+      balance: 10.00
+    };
+
+    // DOM Ready Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      updateUserUI();
+      initChart();
+    });
+
+    // Toggle Mobile Sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobile-overlay');
+      sidebar.classList.toggle('translate-x-full');
+      overlay.classList.toggle('hidden');
+    }
+
+    // Switch Navigation Sections
+    function showSection(sectionId) {
+      // Hide all panels
+      document.querySelectorAll('.view-panel').forEach(panel => {
+        panel.classList.add('hidden');
+      });
+
+      // Show selected panel
+      const targetPanel = document.getElementById(`view-${sectionId}`);
+      if (targetPanel) {
+        targetPanel.classList.remove('hidden');
+      }
+
+      // Update Nav Button Active Style
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.remove('active-nav');
+        btn.classList.add('text-gray-400');
+      });
+
+      const activeNavBtn = document.getElementById(`nav-${sectionId}`);
+      if (activeNavBtn) {
+        activeNavBtn.classList.add('active-nav');
+        activeNavBtn.classList.remove('text-gray-400');
+      }
+
+      // Hide mobile sidebar if open
+      if (window.innerWidth < 1024) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobile-overlay');
+        sidebar.classList.add('translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    // Modal & Auth Logic
+    function openAuthModal() {
+      document.getElementById('auth-modal').classList.remove('hidden');
+    }
+
+    function switchAuthTab(tab) {
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const loginBtn = document.getElementById('tab-login-btn');
+      const regBtn = document.getElementById('tab-register-btn');
+
+      if (tab === 'login') {
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+        loginBtn.classList.add('border-brand-pink', 'text-brand-pink');
+        regBtn.classList.remove('border-brand-pink', 'text-brand-pink');
+      } else {
+        loginForm.classList.add('hidden');
+        registerForm.classList.remove('hidden');
+        regBtn.classList.add('border-brand-pink', 'text-brand-pink');
+        loginBtn.classList.remove('border-brand-pink', 'text-brand-pink');
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value;
+      currentUser.username = username;
+      currentUser.fullname = username;
+      saveUser();
+      document.getElementById('auth-modal').classList.add('hidden');
+      showToast(`مرحباً بعودتك ${username}!`, 'success');
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const fullname = document.getElementById('reg-fullname').value;
+      const username = document.getElementById('reg-username').value;
+      
+      currentUser = {
+        fullname: fullname,
+        username: username,
+        balance: 10.00
+      };
+      saveUser();
+      document.getElementById('auth-modal').classList.add('hidden');
+      showToast('تم إنشاء الحساب بنجاح! حصلت على $10.00 رصيد افتتاحي', 'success');
+    }
+
+    function handleLogout() {
+      showToast('تم تسجيل الخروج بنجاح', 'info');
+      openAuthModal();
+    }
+
+    function saveUser() {
+      localStorage.setItem('zentrix_user', JSON.stringify(currentUser));
+      updateUserUI();
+    }
+
+    function updateUserUI() {
+      document.getElementById('welcome-username').innerText = currentUser.username;
+      document.getElementById('user-display-name').innerText = currentUser.username;
+      document.getElementById('user-avatar').innerText = currentUser.username.charAt(0).toUpperCase();
+      document.getElementById('stat-balance').innerText = `${currentUser.balance.toFixed(2)} دولار`;
+    }
+
+    // Clipboard Copy Helper
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text);
+      showToast(`تم نسخ: ${text}`, 'success');
+    }
+
+    // Dynamic Toast Notifications
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let bg = 'bg-brand-card border-brand-border text-white';
+      if (type === 'success') bg = 'bg-emerald-600 text-white';
+      if (type === 'error') bg = 'bg-rose-600 text-white';
+
+      toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2 transition-all transform duration-300`;
+      toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> ${message}`;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    // Refresh Data
+    function refreshData() {
+      showToast('تم تحديث البيانات المباشرة', 'info');
+    }
+
+    // Claim Bonus
+    function claimBonus() {
+      currentUser.balance += 0.50;
+      saveUser();
+      showToast('تم إضافة 0.50$ مكافأة يومية لحسابك 🎁', 'success');
+    }
+
+    // Download App
+    function downloadApp() {
+      showToast('جاري تحضير رابط تحميل التطبيق...', 'info');
+    }
+
+    // Generate Mock OTP Code
+    function generateMockCode() {
+      const feed = document.getElementById('codes-feed');
+      const randomCode = Math.floor(100000 + Math.random() * 900000);
+      
+      const newCard = document.createElement('div');
+      newCard.className = 'glass-card rounded-2xl p-4 border border-brand-border hover:border-amber-500/50 transition-all flex flex-col md:flex-row items-center justify-between gap-4 animate-bounce';
+      newCard.innerHTML = `
+        <div class="flex items-center gap-4 w-full md:w-auto">
+          <div class="w-12 h-12 rounded-2xl bg-black/40 border border-brand-border flex items-center justify-center text-2xl text-amber-400">
+            <i class="fa-brands fa-whatsapp"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-white text-base">واتساب</h4>
+            <p class="text-xs text-gray-400 font-mono flex items-center gap-2 mt-0.5">
+              <span>🇳🇴 +479123${Math.floor(1000+Math.random()*9000)}</span>
+              <span>• الآن</span>
+            </p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
+          <div class="bg-amber-500/10 border border-amber-500/30 px-5 py-2 rounded-xl font-mono text-2xl font-black text-amber-400 tracking-wider">
+            ${randomCode}
+          </div>
+          <button onclick="copyToClipboard('${randomCode}')" class="bg-brand-main border border-brand-border hover:border-brand-pink text-xs text-gray-200 px-3 py-2 rounded-xl transition-all">
+            انسخ الكود <i class="fa-regular fa-copy mr-1"></i>
+          </button>
+        </div>
+      `;
+
+      feed.prepend(newCard);
+      showToast('وصول كود OTP جديد!', 'success');
+      
+      // Update Total Codes Stat
+      const currentCount = parseInt(document.getElementById('stat-total-codes').innerText);
+      document.getElementById('stat-total-codes').innerText = currentCount + 1;
+    }
+
+    // Chat Assistant
+    function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chatContainer = document.getElementById('chat-messages');
+
+      // User Message
+      const userMsg = document.createElement('div');
+      userMsg.className = 'flex items-start gap-3 justify-end';
+      userMsg.innerHTML = `
+        <div class="bg-rose-600 text-white p-3 rounded-2xl max-w-md text-xs">
+          ${text}
+        </div>
+      `;
+      chatContainer.appendChild(userMsg);
+      input.value = '';
+
+      // Bot Response
+      setTimeout(() => {
+        const botMsg = document.createElement('div');
+        botMsg.className = 'flex items-start gap-3';
+        botMsg.innerHTML = `
+          <div class="w-8 h-8 rounded-lg bg-rose-600 text-white flex items-center justify-center font-bold text-xs">🤖</div>
+          <div class="bg-brand-main border border-brand-border p-3 rounded-2xl max-w-md text-xs text-gray-200">
+            تم استلام طلبك بنجاح! سيتم معالجة استفسارك بخصوص "${text}" بواسطة نظام ZENTRIX التلقائي.
+          </div>
+        `;
+        chatContainer.appendChild(botMsg);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 600);
+    }
+
+    // Chart Initialization
+    function initChart() {
+      const ctx = document.getElementById('activityChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['10-11', '10-12', '10-13', '10-14', '10-15', '10-16', '10-17'],
+          datasets: [{
+            label: 'عدد الرسائل',
+            data: [0, 0, 0, 0, 0, 0, 0],
+            borderColor: '#e11d48',
+            backgroundColor: 'rgba(225, 29, 72, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#e11d48',
+            pointRadius: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#9ca3af', font: { family: 'Cairo' } }
+            },
+            y: {
+              grid: { color: 'rgba(255,255,255,0.05)' },
+              ticks: { color: '#9ca3af', font: { family: 'Cairo' } }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
