@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>رسائل نصية قصيرة من زينتريكس - Zentrix SMS & Admin</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Cairo -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              main: '#0d121d',
+              sidebar: '#121927',
+              card: '#1c2436',
+              border: '#273147',
+              pink: '#e11d48',
+              purple: '#7c3aed',
+              gold: '#f59e0b',
+              green: '#10b981'
+            }
+          },
+          fontFamily: { sans: ['Cairo', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Cairo', sans-serif; background-color: #0d121d; color: #f3f4f6; }
+    .glass-card { background: rgba(28, 36, 54, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    .active-nav { background: linear-gradient(90deg, #e11d48 0%, #be123c 100%); color: white !important; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.35); }
+    .admin-nav { background: linear-gradient(90deg, #7c3aed 0%, #4f46e5 100%); color: white !important; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between text-sm">
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed top-5 left-5 z-50 flex flex-col gap-2"></div>
+
+  <!-- AUTH / LOGIN MODAL -->
+  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="glass-card w-full max-w-md rounded-2xl p-6 sm:p-8 shadow-2xl border border-brand-border">
+      <div class="text-center mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-rose-600 flex items-center justify-center text-white text-xl mx-auto mb-2 shadow-lg shadow-rose-600/30">
+          <i class="fa-solid fa-crown"></i>
+        </div>
+        <h2 class="font-extrabold text-white text-lg">تسجيل الدخول إلى زينتريكس</h2>
+        <p class="text-xs text-gray-400 mt-1">يتطلب دخولك حل سؤال التحقق وتوليد مفتاح أمان 🔐</p>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block mb-1 text-xs text-gray-400">اسم المستخدم</label>
+          <input type="text" id="login-username" required class="w-full bg-brand-main border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-pink" placeholder="أدخل اسم المستخدم (استخدم admin للأدمن)">
+        </div>
+        <div>
+          <label class="block mb-1 text-xs text-gray-400">كلمة المرور</label>
+          <input type="password" id="login-password" required class="w-full bg-brand-main border border-brand-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-pink" placeholder="••••••••">
+        </div>
+
+        <!-- Math Verification (Captcha) -->
+        <div class="bg-brand-main p-3 rounded-xl border border-brand-border">
+          <label class="block mb-1 text-xs text-amber-400 font-bold">نظام التحقق (Captcha):</label>
+          <div class="flex items-center gap-3">
+            <span id="captcha-question" class="text-white font-mono font-bold text-sm bg-brand-card px-3 py-1.5 rounded-lg border border-brand-border">1 + 1 = ?</span>
+            <input type="number" id="captcha-answer" required class="w-full bg-brand-card border border-brand-border rounded-lg px-3 py-1.5 text-white text-xs focus:outline-none focus:border-brand-pink" placeholder="الإجابة">
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-pink-600/30">
+          تحقق ودخول (إنشاء مفتاح عشوائي) <i class="fa-solid fa-key mr-2"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="app-container" class="flex min-h-screen w-full relative hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-brand-sidebar border-l border-brand-border flex flex-col justify-between custom-scrollbar overflow-y-auto">
+      <div>
+        <div class="p-5 border-b border-brand-border flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-indigo-600 flex items-center justify-center text-white text-xl">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <div>
+            <h1 class="font-extrabold text-xs text-white">زينتريكس SMS</h1>
+            <span id="session-key-badge" class="text-[9px] text-amber-400 font-mono">znt_sec_***</span>
+          </div>
+        </div>
+
+        <nav class="p-3 space-y-1">
+          <p class="text-[10px] font-bold text-gray-500 px-3 my-1">الرئيسية</p>
+          <a href="#" onclick="showSection('dashboard')" id="nav-dashboard" class="nav-item active-nav flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all">
+            <i class="fa-solid fa-chart-pie w-5"></i> لوحة التحكم
+          </a>
+          <a href="#" onclick="showSection('my_codes')" id="nav-my_codes" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card">
+            <i class="fa-solid fa-envelope-open-text w-5"></i> my_codes
+          </a>
+          <a href="#" onclick="showSection('my_numbers')" id="nav-my_numbers" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card">
+            <i class="fa-solid fa-mobile-screen w-5"></i> أرقامي
+          </a>
+
+          <!-- ADMIN MENU SECTION -->
+          <div id="admin-menu-section" class="hidden pt-3">
+            <p class="text-[10px] font-bold text-purple-400 px-3 my-1">إدارة النظام (Admin)</p>
+            <a href="#" onclick="showSection('admin_panel')" id="nav-admin_panel" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:text-white hover:bg-brand-card font-bold transition-all">
+              <i class="fa-solid fa-user-shield w-5 text-purple-400"></i> لوحة تحكم الأدمن
+            </a>
+          </div>
+        </nav>
+      </div>
+
+      <div class="p-3 border-t border-brand-border">
+        <button onclick="logoutSession()" class="w-full text-right text-rose-500 hover:text-rose-400 p-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
+          <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENT WRAPPER -->
+    <div class="flex-1 flex flex-col min-w-0">
+      <header class="h-16 bg-brand-sidebar border-b border-brand-border px-6 flex items-center justify-between">
+        <span id="page-title" class="font-bold text-white">لوحة التحكم</span>
+        <div class="flex items-center gap-3">
+          <span id="user-role-badge" class="bg-brand-card px-3 py-1 rounded-xl text-xs text-gray-300 border border-brand-border">مستخدم عادي</span>
+        </div>
+      </header>
+
+      <main class="p-6 space-y-6 flex-1">
+
+        <!-- USER DASHBOARD VIEW -->
+        <section id="view-dashboard" class="view-panel space-y-6">
+          <h2 class="text-xl font-bold text-white">أهلاً وسهلاً بك في منصة زينتريكس</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="glass-card p-5 rounded-2xl border-r-4 border-rose-500">
+              <p class="text-xs text-gray-400">حالة الحساب</p>
+              <h3 class="text-xl font-black text-emerald-400 mt-1">نشط وآمن ✅</h3>
+            </div>
+            <div class="glass-card p-5 rounded-2xl border-r-4 border-indigo-500">
+              <p class="text-xs text-gray-400">مفتاح الجلسة الحالي</p>
+              <h3 id="current-session-key-display" class="text-xs font-mono font-bold text-amber-400 mt-2 truncate">---</h3>
+            </div>
+            <div class="glass-card p-5 rounded-2xl border-r-4 border-amber-500">
+              <p class="text-xs text-gray-400">الرصيد المتاح</p>
+              <h3 class="text-xl font-black text-white mt-1">$10.00</h3>
+            </div>
+          </div>
+        </section>
+
+        <!-- MY CODES VIEW -->
+        <section id="view-my_codes" class="view-panel space-y-6 hidden">
+          <h2 class="text-lg font-bold text-white">my_codes - الأكواد المستلمة</h2>
+          <div class="glass-card p-6 text-center text-gray-400">لا توجد أكواد نشطة حالياً</div>
+        </section>
+
+        <!-- MY NUMBERS VIEW -->
+        <section id="view-my_numbers" class="view-panel space-y-6 hidden">
+          <h2 class="text-lg font-bold text-white">أرقامي المخصصة</h2>
+          <div class="glass-card p-6 text-center text-gray-400">لم يتم تخصيص أرقام بعد</div>
+        </section>
+
+        <!-- ADMIN DASHBOARD VIEW -->
+        <section id="view-admin_panel" class="view-panel space-y-6 hidden">
+          <div>
+            <h2 class="text-xl font-bold text-purple-400 flex items-center gap-2">
+              <i class="fa-solid fa-user-shield"></i> لوحة تحكم الأدمن (Admin Control Panel)
+            </h2>
+            <p class="text-xs text-gray-400 mt-1">إدارة الحسابات، رفع ملفات الأرقام، ومتابعة إحصائيات الاستخدام</p>
+          </div>
+
+          <!-- ADMIN STATS CARDS -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="glass-card p-4 rounded-xl">
+              <p class="text-xs text-gray-400">إجمالي المستخدمين</p>
+              <h3 id="admin-total-users" class="text-2xl font-bold text-white mt-1">0</h3>
+            </div>
+            <div class="glass-card p-4 rounded-xl">
+              <p class="text-xs text-gray-400">الحسابات المحظورة</p>
+              <h3 id="admin-banned-users" class="text-2xl font-bold text-rose-500 mt-1">0</h3>
+            </div>
+            <div class="glass-card p-4 rounded-xl">
+              <p class="text-xs text-gray-400">إجمالي الأرقام المرفوعة</p>
+              <h3 id="admin-total-numbers" class="text-2xl font-bold text-emerald-400 mt-1">0</h3>
+            </div>
+            <div class="glass-card p-4 rounded-xl">
+              <p class="text-xs text-gray-400">حالة الجلسات</p>
+              <h3 class="text-2xl font-bold text-amber-400 mt-1">نشطة 🔑</h3>
+            </div>
+          </div>
+
+          <!-- UPLOAD TXT NUMBERS FILE -->
+          <div class="glass-card p-6 rounded-2xl space-y-4 border border-purple-500/30">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2">
+              <i class="fa-solid fa-file-arrow-up text-purple-400"></i> رفع ملفات الأرقام (صيغة .txt)
+            </h3>
+            <p class="text-xs text-gray-400">قم باختيار ملف .txt يحتوي على الأرقام لإدراجها في قاعدة البيانات تلقائياً.</p>
+            
+            <div class="flex flex-col sm:flex-row gap-3 items-center">
+              <input type="file" id="txt-file-input" accept=".txt" class="w-full bg-brand-main border border-brand-border rounded-xl p-2.5 text-xs text-gray-300 file:ml-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500">
+              <button onclick="handleTxtUpload()" class="w-full sm:w-auto bg-purple-600 hover:bg-purple-500 text-white font-bold px-6 py-3 rounded-xl text-xs transition-all shrink-0">
+                رفع ومعالجة الملف 📂
+              </button>
+            </div>
+            <p id="upload-status" class="text-xs text-emerald-400 font-bold"></p>
+          </div>
+
+          <!-- ALL USERS & STATS TABLE -->
+          <div class="glass-card p-6 rounded-2xl space-y-4">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2">
+              <i class="fa-solid fa-users-gear text-purple-400"></i> كشف الحسابات وإحصائيات الاستخدام اليومية
+            </h3>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-right border-collapse">
+                <thead>
+                  <tr class="border-b border-brand-border text-xs text-gray-400">
+                    <th class="p-3">المستخدم</th>
+                    <th class="p-3">مفتاح الجلسة</th>
+                    <th class="p-3">أرقام اليوم 📱</th>
+                    <th class="p-3">الأكواد المستلمة 💬</th>
+                    <th class="p-3">الحالة</th>
+                    <th class="p-3">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-table-body" class="text-xs divide-y divide-brand-border">
+                  <!-- Dynamic User Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Math Captcha Values
+    let num1 = 1, num2 = 1, expectedAnswer = 2;
+
+    // Database
+    let usersDB = JSON.parse(localStorage.getItem('znt_users_db')) || [
+      { username: 'admin', role: 'admin', balance: 100, status: 'active', sessionKey: 'znt_sec_masterkey99', numbersToday: 12, codesReceived: 35 },
+      { username: 'sudanism', role: 'user', balance: 10, status: 'active', sessionKey: 'znt_sec_sample123', numbersToday: 5, codesReceived: 14 },
+      { username: 'user_test', role: 'user', balance: 5, status: 'active', sessionKey: 'znt_sec_test456', numbersToday: 0, codesReceived: 2 }
+    ];
+
+    let currentSession = JSON.parse(localStorage.getItem('znt_current_session')) || null;
+    let uploadedNumbersCount = parseInt(localStorage.getItem('znt_numbers_count')) || 0;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      generateCaptcha();
+      if (currentSession) {
+        checkAuthUI();
+      }
+    });
+
+    // Captcha Generator
+    function generateCaptcha() {
+      num1 = Math.floor(Math.random() * 10) + 1;
+      num2 = Math.floor(Math.random() * 10) + 1;
+      expectedAnswer = num1 + num2;
+      document.getElementById('captcha-question').innerText = `${num1} + ${num2} = ?`;
+    }
+
+    // Login Functionality
+    function handleLogin(e) {
+      e.preventDefault();
+      
+      const captchaAnswer = parseInt(document.getElementById('captcha-answer').value);
+      if (captchaAnswer !== expectedAnswer) {
+        showToast('إجابة سؤال التحقق خطأ! حاول مجدداً', 'error');
+        generateCaptcha();
+        return;
+      }
+
+      const usernameInput = document.getElementById('login-username').value.trim();
+      let user = usersDB.find(u => u.username === usernameInput);
+
+      if (!user) {
+        user = {
+          username: usernameInput,
+          role: usernameInput === 'admin' ? 'admin' : 'user',
+          balance: 10,
+          status: 'active',
+          sessionKey: '',
+          numbersToday: 0,
+          codesReceived: 0
+        };
+        usersDB.push(user);
+      }
+
+      if (user.status === 'banned') {
+        showToast('عذراً، هذا الحساب محظور من قبل الإدارة!', 'error');
+        generateCaptcha();
+        return;
+      }
+
+      // Generate Random Session Key
+      const randomKey = 'znt_sec_' + Math.random().toString(36).substring(2, 9) + Math.random().toString(36).substring(2, 7);
+      user.sessionKey = randomKey;
+      saveDB();
+
+      currentSession = user;
+      localStorage.setItem('znt_current_session', JSON.stringify(currentSession));
+
+      showToast('تم تسجيل الدخول وتوليد مفتاح أمان عشوائي بنجاح', 'success');
+      checkAuthUI();
+    }
+
+    function checkAuthUI() {
+      document.getElementById('auth-modal').classList.add('hidden');
+      document.getElementById('app-container').classList.remove('hidden');
+
+      document.getElementById('session-key-badge').innerText = `${currentSession.sessionKey.substring(0, 14)}...`;
+      document.getElementById('current-session-key-display').innerText = currentSession.sessionKey;
+
+      if (currentSession.role === 'admin') {
+        document.getElementById('admin-menu-section').classList.remove('hidden');
+        document.getElementById('user-role-badge').innerText = 'مشرف النظام (Admin) 🛡️';
+        loadAdminStats();
+      } else {
+        document.getElementById('admin-menu-section').classList.add('hidden');
+        document.getElementById('user-role-badge').innerText = 'مستخدم عادي';
+      }
+      showSection('dashboard');
+    }
+
+    function logoutSession() {
+      localStorage.removeItem('znt_current_session');
+      location.reload();
+    }
+
+    // Switch Panel Views
+    function showSection(sectionId) {
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById(`view-${sectionId}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-item').forEach(n => {
+        n.classList.remove('active-nav', 'admin-nav');
+        n.classList.add('text-gray-400');
+      });
+
+      const activeBtn = document.getElementById(`nav-${sectionId}`);
+      if(activeBtn) {
+        if(sectionId === 'admin_panel') {
+          activeBtn.classList.add('admin-nav');
+        } else {
+          activeBtn.classList.add('active-nav');
+        }
+        activeBtn.classList.remove('text-gray-400');
+      }
+    }
+
+    // Admin Panel Logic
+    function loadAdminStats() {
+      document.getElementById('admin-total-users').innerText = usersDB.length;
+      document.getElementById('admin-banned-users').innerText = usersDB.filter(u => u.status === 'banned').length;
+      document.getElementById('admin-total-numbers').innerText = uploadedNumbersCount;
+
+      const tbody = document.getElementById('admin-users-table-body');
+      tbody.innerHTML = '';
+
+      usersDB.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-3 font-bold text-white">${u.username} ${u.role === 'admin' ? '⭐' : ''}</td>
+          <td class="p-3 font-mono text-amber-400 text-[11px]">${u.sessionKey || 'غير متصل'}</td>
+          <td class="p-3 text-indigo-400 font-bold">${u.numbersToday || 0} رقم</td>
+          <td class="p-3 text-rose-400 font-bold">${u.codesReceived || 0} كود</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+              ${u.status === 'active' ? 'نشط' : 'محظور'}
+            </span>
+          </td>
+          <td class="p-3">
+            ${u.username !== 'admin' ? `
+              <button onclick="toggleBanUser('${u.username}')" class="px-3 py-1 rounded-lg text-xs font-bold ${u.status === 'active' ? 'bg-rose-600/20 text-rose-400 hover:bg-rose-600 hover:text-white' : 'bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white'} transition-all">
+                ${u.status === 'active' ? 'حظر' : 'إلغاء الحظر'}
+              </button>
+            ` : '<span class="text-gray-500">محمي</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function toggleBanUser(username) {
+      const user = usersDB.find(u => u.username === username);
+      if (user) {
+        user.status = user.status === 'active' ? 'banned' : 'active';
+        saveDB();
+        loadAdminStats();
+        showToast(`تم تحديث حالة المستخدم ${username}`, 'success');
+      }
+    }
+
+    function handleTxtUpload() {
+      const fileInput = document.getElementById('txt-file-input');
+      const status = document.getElementById('upload-status');
+
+      if (fileInput.files.length === 0) {
+        showToast('الرجاء اختيار ملف .txt أولاً', 'error');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const content = e.target.result;
+        const lines = content.split(/\r?\n/).filter(line => line.trim() !== '');
+        
+        uploadedNumbersCount += lines.length;
+        localStorage.setItem('znt_numbers_count', uploadedNumbersCount);
+
+        status.innerText = `تم رفع ومعالجة الملف! تم إدراج ${lines.length} رقم جديد.`;
+        loadAdminStats();
+        showToast(`تم إضافة ${lines.length} رقم بنجاح`, 'success');
+      };
+
+      reader.readAsText(file);
+    }
+
+    function saveDB() {
+      localStorage.setItem('znt_users_db', JSON.stringify(usersDB));
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      let bg = type === 'success' ? 'bg-emerald-600 text-white' : (type === 'error' ? 'bg-rose-600 text-white' : 'bg-brand-card text-white');
+      toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center gap-2`;
+      toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> ${message}`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+  </script>
+</body>
+</html>
